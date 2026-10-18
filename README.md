@@ -31,7 +31,15 @@ Bosch BNO055 9-axis IMU over I2C, and see the orientation live in a 3D viewer in
    scripts/flash.sh webserial_3d
    python3 scripts/verify.py
    ```
-5. Close any serial monitor, then open the
+5. Run the local viewer. It opens `http://localhost:8000` with a live 3D model, and needs no
+   browser permissions:
+   ```bash
+   python3 scripts/viewer.py            # or: python3 scripts/viewer.py COM5 8000
+   ```
+   Drag to orbit and press `Z` to set the current pose as zero. The page loads three.js from a CDN.
+   Close any other program using the serial port first.
+
+   Alternatively, use Adafruit's browser viewer: close any serial monitor, then open the
    [Adafruit WebSerial 3D viewer](https://adafruit.github.io/Adafruit_WebSerial_3DModelViewer/),
    click **Connect** and pick the XIAO's serial port. Tilt the sensor and the model follows.
 
@@ -54,7 +62,8 @@ The BNO055 calibrates itself on every power-up. The viewer shows four values fro
 |---|---|
 | `firmware/webserial_3d` | Streams orientation, quaternion and calibration at 115200 baud |
 | `firmware/i2c_scan` | Scans the bus and reads the BNO055 chip ID |
-| `scripts/` | `setup.sh`, `flash.sh`, `monitor.py`, `verify.py` |
+| `scripts/` | `setup.sh`, `flash.sh`, `monitor.py`, `verify.py`, `viewer.py` |
+| `viewer/` | Web page served by `viewer.py` |
 | `docs/` | Wiring diagram and troubleshooting |
 
 ## Troubleshooting
