@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" font-family="Helvetica,Arial,sans-serif" font-size="14">
+  <rect width="720" height="420" fill="#fff"/>
+  <text x="360" y="28" text-anchor="middle" font-size="18" font-weight="bold">XIAO ESP32S3 to BNO055 (I2C)</text>
+
+  <!-- XIAO -->
+  <rect x="60" y="70" width="190" height="300" rx="8" fill="#e8f1ee" stroke="#2c6e63" stroke-width="2"/>
+  <text x="155" y="95" text-anchor="middle" font-weight="bold">Seeed XIAO ESP32S3</text>
+  <text x="155" y="355" text-anchor="middle" fill="#555">USB-C (power + serial)</text>
+  <g fill="#2c6e63">
+    <circle cx="250" cy="150" r="5"/><circle cx="250" cy="190" r="5"/>
+    <circle cx="250" cy="230" r="5"/><circle cx="250" cy="270" r="5"/>
+  </g>
+  <text x="238" y="154" text-anchor="end">D4 / GPIO5 (SDA)</text>
+  <text x="238" y="194" text-anchor="end">D5 / GPIO6 (SCL)</text>
+  <text x="238" y="234" text-anchor="end">3V3</text>
+  <text x="238" y="274" text-anchor="end">GND</text>
+
+  <!-- BNO055 -->
+  <rect x="470" y="110" width="190" height="220" rx="8" fill="#f3ecf8" stroke="#6a3d8a" stroke-width="2"/>
+  <text x="565" y="135" text-anchor="middle" font-weight="bold">BNO055 breakout</text>
+  <g fill="#6a3d8a">
+    <circle cx="470" cy="150" r="5"/><circle cx="470" cy="190" r="5"/>
+    <circle cx="470" cy="230" r="5"/><circle cx="470" cy="270" r="5"/>
+  </g>
+  <text x="482" y="154">SDA</text>
+  <text x="482" y="194">SCL</text>
+  <text x="482" y="234">VIN (3V3)</text>
+  <text x="482" y="274">GND</text>
+  <text x="565" y="310" text-anchor="middle" fill="#555" font-size="12">ADR left open = 0x28</text>
+
+  <!-- wires -->
+  <polyline points="250,150 470,150" fill="none" stroke="#1f5fbf" stroke-width="3"/>
+  <polyline points="250,190 470,190" fill="none" stroke="#d99a00" stroke-width="3"/>
+  <polyline points="250,230 470,230" fill="none" stroke="#c0392b" stroke-width="3"/>
+  <polyline points="250,270 470,270" fill="none" stroke="#222" stroke-width="3"/>
+  <text x="360" y="143" text-anchor="middle" fill="#1f5fbf">blue</text>
+  <text x="360" y="183" text-anchor="middle" fill="#d99a00">yellow</text>
+  <text x="360" y="223" text-anchor="middle" fill="#c0392b">red</text>
+  <text x="360" y="263" text-anchor="middle" fill="#222">black</text>
+
+  <text x="360" y="400" text-anchor="middle" fill="#555" font-size="12">No external pull-ups needed if the breakout has them (Adafruit and most clones do).</text>
+</svg>
