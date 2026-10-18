@@ -36,8 +36,9 @@ Bosch BNO055 9-axis IMU over I2C, and see the orientation live in a 3D viewer in
    ```bash
    python3 scripts/viewer.py            # or: python3 scripts/viewer.py COM5 8000
    ```
-   Drag to orbit and press `Z` to set the current pose as zero. The page loads three.js from a CDN.
-   Close any other program using the serial port first.
+   The page shows the board with labelled X/Y/Z axes, heading/pitch/roll and calibration status bars.
+   Drag to orbit and press `Z` to set the current pose as zero. Close any other program using the
+   serial port first. Full details in [docs/viewer.md](docs/viewer.md).
 
    Alternatively, use Adafruit's browser viewer: close any serial monitor, then open the
    [Adafruit WebSerial 3D viewer](https://adafruit.github.io/Adafruit_WebSerial_3DModelViewer/),
@@ -64,7 +65,7 @@ The BNO055 calibrates itself on every power-up. The viewer shows four values fro
 | `firmware/i2c_scan` | Scans the bus and reads the BNO055 chip ID |
 | `scripts/` | `setup.sh`, `flash.sh`, `monitor.py`, `verify.py`, `viewer.py` |
 | `viewer/` | Web page served by `viewer.py` |
-| `docs/` | Wiring diagram and troubleshooting |
+| `docs/` | Wiring diagram, viewer guide and troubleshooting |
 
 ## Troubleshooting
 

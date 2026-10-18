@@ -11,7 +11,13 @@
   #hud b { font-variant-numeric:tabular-nums; }
   #status { color:var(--bad); }
   #status.live { color:var(--ok); }
-  .cal span { display:inline-block; min-width:70px; color:var(--muted); }
+  #cal { margin-top:6px; display:grid; grid-template-columns:auto 96px auto; gap:4px 10px; align-items:center; }
+  .bar { display:flex; gap:3px; }
+  .bar i { width:22px; height:8px; border-radius:2px; background:#2a3138; }
+  .lvl0 i:nth-child(-n+0), .lvl1 i:nth-child(-n+1), .lvl2 i:nth-child(-n+2), .lvl3 i:nth-child(-n+3) { background:var(--c); }
+  .lvl0 { --c:var(--bad); } .lvl1 { --c:#e5a03b; } .lvl2 { --c:#d4d34a; } .lvl3 { --c:var(--ok); }
+  .lbl { color:var(--muted); font-size:13px; }
+  .hint { color:var(--muted); margin-top:6px; max-width:380px; font-size:13px; }
   canvas { display:block; }
 </style>
 </head>
@@ -19,7 +25,8 @@
 <div id="hud">
   <div id="status">waiting for data...</div>
   <div>Heading <b id="h">-</b>&deg; &nbsp; Pitch <b id="p">-</b>&deg; &nbsp; Roll <b id="r">-</b>&deg;</div>
-  <div class="cal"><span>sys <b id="c0">-</b>/3</span><span>gyro <b id="c1">-</b>/3</span><span>accel <b id="c2">-</b>/3</span><span>mag <b id="c3">-</b>/3</span></div>
+  <div id="cal"></div>
+  <div class="hint" id="hint"></div>
   <div style="color:var(--muted)">Drag to orbit. Press Z to set the current pose as "zero".</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -38,10 +45,21 @@ sun.position.set(3, 5, 2);
 scene.add(sun);
 scene.add(new THREE.GridHelper(8, 16, 0x2a3138, 0x20262b));
 
-// A board-shaped box with coloured axes (red X, green Y, blue Z in sensor frame)
+// A board-shaped box with labelled axes in the SENSOR frame. The BNO055 is Z-up and
+// three.js is Y-up, so sensor (X, Y, Z) is drawn along three.js (x, -z, y).
 const body = new THREE.Group();
 body.add(new THREE.Mesh(new THREE.BoxGeometry(2, 0.2, 1.4), new THREE.MeshStandardMaterial({ color: 0x6a3d8a })));
-body.add(new THREE.AxesHelper(1.6));
+function label(text, color, pos) {
+  const c = document.createElement("canvas"); c.width = c.height = 64;
+  const g = c.getContext("2d"); g.fillStyle = color; g.font = "bold 48px sans-serif"; g.textAlign = "center"; g.fillText(text, 32, 50);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+  sp.position.copy(pos); sp.scale.set(0.5, 0.5, 1); return sp;
+}
+[["X", "#ff5555", new THREE.Vector3(1, 0, 0)], ["Y", "#55dd66", new THREE.Vector3(0, 0, -1)], ["Z", "#5599ff", new THREE.Vector3(0, 1, 0)]]
+  .forEach(([name, color, dir]) => {
+    body.add(new THREE.ArrowHelper(dir, new THREE.Vector3(0, 0, 0), 1.7, color, 0.25, 0.15));
+    body.add(label(name, color, dir.clone().multiplyScalar(2.05)));
+  });
 scene.add(body);
 
 let latest = new THREE.Quaternion(), zero = new THREE.Quaternion();
@@ -49,6 +67,26 @@ let lastMsg = 0;
 
 // BNO055 frame is Z-up; three.js is Y-up. Map (x, y, z) -> (x, z, -y).
 function fromBno(w, x, y, z) { return new THREE.Quaternion(x, z, -y, w); }
+
+const CAL = [
+  { name: "System", hint: "" },
+  { name: "Gyro", hint: "keep the sensor still for a few seconds" },
+  { name: "Accel", hint: "hold it still in several different orientations (each face)" },
+  { name: "Mag", hint: "wave it in a figure eight" },
+];
+const LEVELS = ["Uncalibrated", "Low", "Medium", "Calibrated"];
+const calEl = document.getElementById("cal");
+calEl.innerHTML = CAL.map((c, i) =>
+  `<span>${c.name}</span><span class="bar lvl0" id="bar${i}"><i></i><i></i><i></i></span><span class="lbl" id="lbl${i}">-</span>`).join("");
+function showCal(v) {
+  v.forEach((n, i) => {
+    document.getElementById("bar" + i).className = "bar lvl" + n;
+    document.getElementById("lbl" + i).textContent = `${LEVELS[n]} (${n}/3)`;
+  });
+  const todo = CAL.slice(1).filter((c, i) => v[i + 1] < 3).map((c) => `${c.name}: ${c.hint}`);
+  document.getElementById("hint").textContent =
+    v[0] === 3 && !todo.length ? "Fully calibrated." : todo.length ? "To calibrate - " + todo.join("; ") + "." : "";
+}
 
 const ev = new EventSource("/events");
 ev.onmessage = (m) => {
@@ -60,7 +98,7 @@ ev.onmessage = (m) => {
     document.getElementById("p").textContent = p.toFixed(1);
     document.getElementById("r").textContent = r.toFixed(1);
   }
-  if (d.calibration) d.calibration.forEach((v, i) => document.getElementById("c" + i).textContent = v);
+  if (d.calibration) showCal(d.calibration);
   lastMsg = performance.now();
 };
 addEventListener("keydown", (e) => { if (e.key.toLowerCase() === "z") zero = latest.clone().invert(); });
